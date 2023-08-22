@@ -11,13 +11,15 @@ namespace StudentApi.Controllers
     {
         private IStudentRepo _repo;
         // GET: api/<StudentController>
-        public StudentController(StudentRepo repo)
+        public StudentController(IStudentRepo repo)
         {
             _repo = repo;
         }
         [HttpGet]
         public IActionResult Get()
         {
+            if (_repo.GetStudents() == null) { return BadRequest("There are no records"); }
+            else
              return Ok(_repo.GetStudents());
         }
 
@@ -32,7 +34,13 @@ namespace StudentApi.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] Student student)
         {
-            return Created("OK", student);
+              var temp =  _repo.AddStudent(student);
+            if (temp != null)
+            {
+                return Created("OK", student);
+            }
+            else
+                return BadRequest("There was some error");
         }
 
         // PUT api/<StudentController>/5
